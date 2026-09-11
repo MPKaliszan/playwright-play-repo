@@ -1,0 +1,107 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: todos.spec.js >> Make task, complete, then delete it
+- Location: tests\todos.spec.js:29:5
+
+# Error details
+
+```
+ReferenceError: screenshot is not defined
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - text: This is just a demo of TodoMVC for testing, not the
+    - link "real TodoMVC app." [ref=e3]:
+      - /url: https://todomvc.com/
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "todos" [level=1] [ref=e7]
+      - textbox "What needs to be done?" [ref=e8]
+    - generic [ref=e9]:
+      - checkbox "❯Mark all as complete" [checked] [ref=e10]
+      - generic [ref=e11]: ❯Mark all as complete
+      - list [ref=e12]:
+        - listitem [ref=e13]:
+          - generic [ref=e14]:
+            - checkbox "Toggle Todo" [checked] [ref=e15]
+            - generic [ref=e16]: milk
+            - button "Delete" [ref=e17]: ×
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - strong [ref=e20]: "0"
+        - text: items left
+      - list [ref=e21]:
+        - listitem [ref=e22]:
+          - link "All" [ref=e23]:
+            - /url: "#/"
+        - listitem [ref=e24]:
+          - link "Active" [ref=e25]:
+            - /url: "#/active"
+        - listitem [ref=e26]:
+          - link "Completed" [ref=e27]:
+            - /url: "#/completed"
+      - button "Clear completed" [ref=e28] [cursor=pointer]
+  - contentinfo [ref=e29]:
+    - paragraph [ref=e30]: Double-click to edit a todo
+    - paragraph [ref=e31]:
+      - text: Created by
+      - link "Remo H. Jansen" [ref=e32]:
+        - /url: http://github.com/remojansen/
+    - paragraph [ref=e33]:
+      - text: Part of
+      - link "TodoMVC" [ref=e34]:
+        - /url: http://todomvc.com
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | import { todoPages } from './pages/todoPages';
+  3  | import * as allure from 'allure-js-commons';
+  4  | 
+  5  | let todoPage
+  6  | 
+  7  | test.beforeEach(async ({ page }) => {
+  8  |   // Runs before each test and signs in each page.
+  9  |     todoPage = new todoPages(page);
+  10 |     await todoPage.goto();
+  11 |     const screenshot = await page.screenshot(); 
+  12 | 
+  13 | });
+  14 | 
+  15 | test('Add milk', async ({ page }) => {
+  16 |     await todoPage.addTodo('milk');
+  17 |   // Expect a title "to contain" a substring.
+  18 |   await expect(page.getByTestId("todo-title")).toHaveText("milk");
+  19 | });
+  20 | 
+  21 | test('Make task, then complete it', async({page}) => {
+  22 |   const milk = "milk";
+  23 |   await todoPage.addTodo(milk);
+  24 |   await todoPage.markComplete(milk);
+  25 |   await expect(todoPage.todoItem(milk)).toHaveClass('completed');
+  26 |     
+  27 | });
+  28 | 
+  29 | test('Make task, complete, then delete it', async({page}) => {
+  30 |   const milk = "milk";
+  31 |   await todoPage.addTodo(milk);
+  32 |   await todoPage.markComplete(milk);
+> 33 |   await allure.attachment('Step Screenshot', screenshot, 'image/png');
+     |                                              ^ ReferenceError: screenshot is not defined
+  34 |   await todoPage.deleteTodo(milk);
+  35 |   await allure.attachment('Step Screenshot', screenshot, 'image/png');
+  36 |   await expect(todoPage.todoItem(milk)).toBeNull;
+  37 | });
+```

@@ -1,0 +1,107 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: todos.spec.js >> Make task, then complete it
+- Location: tests\todos.spec.js:13:5
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: locator.check: Test timeout of 30000ms exceeded.
+Call log:
+  - waiting for getByRole('checkbox', { name: 'milk' })
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - text: This is just a demo of TodoMVC for testing, not the
+    - link "real TodoMVC app." [ref=e3]:
+      - /url: https://todomvc.com/
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "todos" [level=1] [ref=e7]
+      - textbox "What needs to be done?" [active] [ref=e8]
+    - generic [ref=e9]:
+      - checkbox "❯Mark all as complete" [ref=e10]
+      - generic [ref=e11]: ❯Mark all as complete
+      - list [ref=e12]:
+        - listitem [ref=e13]:
+          - generic [ref=e14]:
+            - checkbox "Toggle Todo" [ref=e15]
+            - generic [ref=e16]: milk
+            - text: ×
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - strong [ref=e19]: "1"
+        - text: item left
+      - list [ref=e20]:
+        - listitem [ref=e21]:
+          - link "All" [ref=e22]:
+            - /url: "#/"
+        - listitem [ref=e23]:
+          - link "Active" [ref=e24]:
+            - /url: "#/active"
+        - listitem [ref=e25]:
+          - link "Completed" [ref=e26]:
+            - /url: "#/completed"
+  - contentinfo [ref=e27]:
+    - paragraph [ref=e28]: Double-click to edit a todo
+    - paragraph [ref=e29]:
+      - text: Created by
+      - link "Remo H. Jansen" [ref=e30]:
+        - /url: http://github.com/remojansen/
+    - paragraph [ref=e31]:
+      - text: Part of
+      - link "TodoMVC" [ref=e32]:
+        - /url: http://todomvc.com
+```
+
+# Test source
+
+```ts
+  1  | import {Page, Locator} from '@playwright/test';
+  2  | 
+  3  | export class todoPages {
+  4  |     readonly page: Page;
+  5  |     readonly todoInput: Locator;
+  6  | 
+  7  |     constructor(page: Page) {
+  8  |         this.page = page;
+  9  |         this.todoInput = page.getByPlaceholder('What needs to be done?');
+  10 |     }
+  11 | 
+  12 |     async goto() {
+  13 |         await this.page.goto("https://demo.playwright.dev/todomvc");
+  14 | 
+  15 |     }
+  16 | 
+  17 |     async addTodo(todo: string) {
+  18 |         await this.todoInput.fill(todo);
+  19 |         await this.todoInput.press('Enter');
+  20 |     }
+  21 | 
+  22 |     async markComplete(completedTask: string) {
+  23 |         await this.page.getByRole("checkbox", {name:completedTask})
+> 24 |         .check();
+     |          ^ Error: locator.check: Test timeout of 30000ms exceeded.
+  25 |     }
+  26 | 
+  27 |     todoItem(name: string): Locator {
+  28 |     return this.page.getByRole('listitem').filter({ hasText: name });
+  29 | }
+  30 | 
+  31 | }
+```
