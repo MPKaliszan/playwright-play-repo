@@ -11,6 +11,7 @@ playwright-report/
 allure-results/
 allure-report/
 .env
-
+/custom_report/
+report-template.html
 # Playwright
 /playwright/.auth/

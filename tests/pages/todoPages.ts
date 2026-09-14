@@ -3,10 +3,12 @@ import {Page, Locator} from '@playwright/test';
 export class todoPages {
     readonly page: Page;
     readonly todoInput: Locator;
+    readonly filteringButtons: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.todoInput = page.getByPlaceholder('What needs to be done?');
+        this.filteringButtons = page.locator(".filters");
     }
 
     todoItem(name: string): Locator {
@@ -35,6 +37,12 @@ export class todoPages {
         await this.todoItem(toDeleteTask)
         .getByRole("button").filter()
         .click();
+    }
+
+    async clickButton(toClickButton:string) {
+    await this.page.getByRole('link', { name: toClickButton }).click();
+
+
     }
 
 }
