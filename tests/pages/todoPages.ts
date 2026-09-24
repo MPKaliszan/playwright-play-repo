@@ -3,17 +3,25 @@ import {Page, Locator} from '@playwright/test';
 export class todoPages {
     readonly page: Page;
     readonly todoInput: Locator;
-    readonly filteringButtons: Locator;
+    readonly headerText: Locator;
+    readonly topWarningText: Locator;
+    readonly footers: Locator;
+
 
     constructor(page: Page) {
         this.page = page;
         this.todoInput = page.getByPlaceholder('What needs to be done?');
-        this.filteringButtons = page.locator(".filters");
+        this.headerText = page.locator(".header");
+        this.topWarningText = page.getByText("This is just a demo of TodoMVC for testing, not the real TodoMVC app.")
+        this.footers = page.locator(".info");
     }
 
     todoItem(name: string): Locator {
     return this.page.getByRole('listitem').filter({ hasText: name });
 }
+    topWarningTextContent() {
+        return this.topWarningText;
+    }
 
 
     async goto() {
@@ -42,7 +50,8 @@ export class todoPages {
     async clickButton(toClickButton:string) {
     await this.page.getByRole('link', { name: toClickButton }).click();
 
-
     }
+
+    
 
 }

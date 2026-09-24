@@ -63,3 +63,36 @@ test('Click through filtering buttons, confirm functionality',async({page}) => {
   await expect(todoPage.todoItem("Get Greggs")).toBeVisible();
   
 });
+
+test('Check for correct header', async({page}) => {
+  const expectedHeader = "todos";
+  await expect( todoPage.headerText).toBeVisible();
+  await expect( todoPage.headerText,
+    `Expected header to contain "${expectedHeader}"`)
+    .toHaveText(expectedHeader)
+});
+
+test('Check for correct warning', async({page}) => {
+  const expectedWarning = "This is just a demo of TodoMVC for testing, not the real TodoMVC app.";
+  await expect( todoPage.topWarningTextContent()).toBeVisible();
+  await expect( todoPage.topWarningTextContent(),
+    `Expected header to contain "${expectedWarning}"`)
+    .toHaveText(expectedWarning)
+});
+
+test('Check for correct footer', async({page}) => {
+  const expectedFooter1 = "Double-click to edit a todo";
+  const expectedFooter2 = "Created by Remo H. Jansen";
+  const expectedFooter3 = "Part of TodoMVC";
+
+  await expect( todoPage.footers).toBeVisible();
+  await expect( todoPage.footers,
+    `Expected header to contain "${expectedFooter1}"`)
+    .toHaveText(expectedFooter1) ;
+  await expect( todoPage.footers,
+    `Expected header to contain "${expectedFooter2}"`)
+    .toHaveText(expectedFooter2)
+  await expect( todoPage.footers,
+    `Expected header to contain "${expectedFooter3}"`)
+    .toHaveText(expectedFooter3)
+});
