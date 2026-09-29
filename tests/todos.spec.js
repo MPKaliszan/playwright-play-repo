@@ -81,18 +81,18 @@ test('Check for correct warning', async({page}) => {
 });
 
 test('Check for correct footer', async({page}) => {
-  const expectedFooter1 = "Double-click to edit a todo";
-  const expectedFooter2 = "Created by Remo H. Jansen";
-  const expectedFooter3 = "Part of TodoMVC";
-
+  const expectedFooters = ["Double-click to edit a todo","Created by Remo H. Jansen","Part of TodoMVC"] ;
+  //wait for footers to be visible, then take the text strings from expectedFooters and check if text contains those strings in any order
   await expect( todoPage.footers).toBeVisible();
-  await expect( todoPage.footers,
-    `Expected header to contain "${expectedFooter1}"`)
-    .toHaveText(expectedFooter1) ;
-  await expect( todoPage.footers,
-    `Expected header to contain "${expectedFooter2}"`)
-    .toHaveText(expectedFooter2)
-  await expect( todoPage.footers,
-    `Expected header to contain "${expectedFooter3}"`)
-    .toHaveText(expectedFooter3)
+  for (const text of expectedFooters) {
+    await expect(todoPage.footers).toContainText(text);
+  }
+
+  //Validate the existence of links within the text
+  await expect(
+    todoPage.footers.getByRole("link", { name: "Remo H. Jansen" })
+).toHaveAttribute("href", "http://github.com/remojansen/");
+  await expect(
+    todoPage.footers.getByRole("link",{ name: "TodoMVC" })
+).toHaveAttribute("href", "http://todomvc.com");
 });
