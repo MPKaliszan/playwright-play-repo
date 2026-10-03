@@ -1,123 +1,223 @@
 # Playwright QA Automation Practice
 
-A hands-on QA automation project built to develop and demonstrate practical experience with **Playwright**, UI testing, API testing, Page Object Model, fixtures, assertions, and test organization.
+A personal QA automation practice project built to develop practical Playwright skills across UI and API testing.
 
-The project uses the [TodoMVC](https://demo.playwright.dev/todomvc/) application as a small, predictable test target while focusing on writing maintainable and meaningful test cases.
+The project focuses on writing maintainable, readable tests while exploring Playwright's core features rather than building an overly complex automation framework.
 
-## Current Focus
+## Current Coverage
 
-* UI functional testing
-* Page Object Model (POM)
-* Playwright locators and locator chaining
-* Assertions and negative assertions
-* Custom Playwright fixtures
-* Test organization and separation of concerns
-* DOM/accessibility roles
-* Allure screenshots and reporting
-* API / endpoint testing *(in progress)*
-* CI/CD integration *(planned)*
+### UI Testing
+
+The UI suite uses the [TodoMVC](https://demo.playwright.dev/todomvc/) application and currently covers:
+
+* Adding todo items
+* Completing todo items
+* Deleting todo items
+* Multiple todo items
+* Active / Completed / All filtering
+* Header validation
+* Footer validation
+* Link and attribute validation
+* Element visibility and state
+* Accessibility-based locators
+
+### API Testing
+
+API tests use ReqRes and currently cover:
+
+* GET endpoint health checks
+* API authentication
+* Missing API-key handling
+* Read-only vs administrative API access
+* Creating records with POST
+* Extracting IDs from JSON responses
+* Fetching newly created records
+* Deleting records
+* Verifying deleted records return `404`
+* Chaining dependent API requests
+
+The current API lifecycle test follows:
+
+```text
+POST → extract ID → GET → DELETE → GET
+```
+
+## Playwright Features Practiced
+
+* Locators
+* Accessibility roles
+* Locator chaining and filtering
+* Assertions
+* Page Object Model
+* Custom fixtures
+* API request testing
+* Request headers and authentication
+* JSON request / response handling
+* Test tags
+* Multiple browser projects
+* Allure reporting
+* Screenshots
+* Environment variables
+* Git / GitHub workflow
 
 ## Project Structure
 
 ```text
-.
-├── pages/
-│   └── todoPages.js
-│
-├── tests/
-│   ├── functionality.spec.js
-│   ├── layout.spec.js
-│   └── fixtures.js
-│
+Playwright/
 ├── playwright.config.js
 ├── package.json
-└── .gitignore
+├── .env
+├── tests/
+│   ├── Api/
+│   │   └── api.spec.js
+│   ├── TodoMVC/
+│   │   ├── todo.Functionality.spec.js
+│   │   └── todoPage.Layout.spec.js
+│   ├── utils/
+│   │   ├── genericUtils.ts
+│   │   └── MockBuilder.js
+│   └── example.spec.js
+└── ...
 ```
+
+The API client abstraction is the next planned step for reducing repeated API request logic.
 
 ## Page Object Model
 
-The TodoMVC interface is represented by a `todoPages` Page Object.
-
-The Page Object contains:
-
-* Locators
-* Page interaction methods
-* Reusable element targeting logic
+UI interaction logic is separated from test scenarios using Page Objects.
 
 For example:
 
-```js
-await todoPage.addTodo('Buy milk');
-await todoPage.markComplete('Buy milk');
-await todoPage.deleteTodo('Buy milk');
+```text
+Test
+ ↓
+Todo Page Object
+ ↓
+Playwright Locator
+ ↓
+Browser
 ```
 
-Assertions remain primarily in the test specifications so that the Page Object describes **how to interact with the application**, while the tests describe **what behavior is expected**.
+The Page Object handles interactions such as:
+
+```js
+addTodo()
+markComplete()
+deleteTodo()
+clickButton()
+todoItem()
+```
+
+Tests remain responsible for defining the scenario and asserting the expected result.
+
+## API Client
+
+API testing follows a similar separation of responsibilities.
+
+The planned structure is:
+
+```text
+Test
+ ↓
+API Client
+ ↓
+Playwright request
+ ↓
+HTTP API
+```
+
+The API Client will encapsulate reusable operations such as:
+
+```js
+createRecord()
+getRecord()
+deleteRecord()
+```
+
+while keeping assertions in the test cases.
 
 ## Fixtures
 
-A custom Playwright fixture provides an initialized `todoPage` object to tests.
+A custom Playwright fixture is used to initialize the TodoMVC Page Object:
 
 ```js
-test('Add a todo', async ({ todoPage }) => {
-    await todoPage.addTodo('Buy milk');
-
-    await expect(
-        todoPage.todoItem('Buy milk')
-    ).toBeVisible();
+test('example', async ({ todoPage }) => {
+    await todoPage.addTodo('milk');
 });
 ```
 
-The fixture handles creating the Page Object and navigating to the application, avoiding duplicated setup across specification files.
+This keeps setup consistent across tests and avoids duplicating Page Object initialization.
 
-## Tests
+## API Authentication
 
-Current UI coverage includes:
+API credentials are stored in environment variables rather than committed to the repository.
 
-* Creating todo items
-* Completing todo items
-* Deleting todo items
-* Verifying multiple items
-* Filtering active/completed/all items
-* Verifying page header content
-* Verifying footer content
-* Verifying links and their target URLs
-* Basic visibility and DOM assertions
+Example:
 
-## Running the Tests
-
-Install dependencies:
-
-```bash
-npm install
+```env
+REQRES_API_KEY=...
+REQRES_API_KEY_ADMIN=...
 ```
 
-Run the complete test suite:
+`.env` is excluded through `.gitignore`.
+
+## Running Tests
+
+Run the complete suite:
 
 ```bash
 npx playwright test
 ```
 
-Run a specific specification:
+Run a specific test:
 
 ```bash
-npx playwright test tests/functionality.spec.js
+npx playwright test -g "test name"
 ```
 
-Run a test by name:
+Run API tests by tag:
 
 ```bash
-npx playwright test -g "Add milk"
+npx playwright test --grep "@api"
+```
+
+List discovered tests:
+
+```bash
+npx playwright test --list
 ```
 
 ## Reporting
 
-The project also uses **Allure** for test reporting and captures screenshots at selected points during test execution.
+Allure reporting is configured for the project.
 
-## Purpose
+Test screenshots can also be attached to Allure reports during test execution.
 
-This repository is primarily a **hands-on QA automation learning and portfolio project**.
+## Goals
 
-The goal is to build practical familiarity with Playwright and modern automated testing techniques while applying QA principles such as meaningful coverage, maintainability, clear assertions, and separation of responsibilities.
+This project is primarily a practical learning and portfolio project focused on QA engineering skills:
 
-Further work will expand the project into API testing and CI/CD.
+* Playwright
+* UI automation
+* API testing
+* JavaScript / TypeScript
+* Test design
+* Maintainable test structure
+* CI/CD
+* Git / GitHub
+
+Future work includes expanding API coverage, introducing the API Client abstraction, and integrating the project into CI/CD.
+
+## Why This Project?
+
+The goal is not to create the most elaborate automation framework possible.
+
+Instead, the project is intended to demonstrate the ability to:
+
+1. Understand an application's behavior.
+2. Design meaningful test scenarios.
+3. Select appropriate locators and assertions.
+4. Automate UI and API workflows.
+5. Reuse common test interactions without hiding the test logic.
+6. Diagnose failures and understand what the underlying tools are doing.
+7. Maintain a practical, readable automation suite.
